@@ -9,5 +9,11 @@ routes.push({
   handler: controller.getUsers
 })
 
+routes.push({
+  method: 'POST',
+  path: `/${root}`,
+  handler: controller.create,
+})
+
 
 module.exports = routes
