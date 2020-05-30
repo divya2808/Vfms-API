@@ -15,5 +15,11 @@ routes.push({
   handler: controller.create,
 })
 
+routes.push({
+  method: 'POST',
+  path: `/${root}/authenticate`,
+  handler: controller.authenticate
+})
+
 
 module.exports = routes

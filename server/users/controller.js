@@ -10,7 +10,14 @@ async function create(req) {
   return await service.create(username, password)
 }
 
+async function authenticate(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  return await service.authenticate(username, password)
+}
+
 module.exports = {
   getUsers,
-  create
+  create,
+  authenticate
 }
