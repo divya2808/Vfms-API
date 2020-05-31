@@ -5,8 +5,8 @@ const controller = require('./controller')
 
 routes.push({
   method: 'GET',
-  path: `/${root}`,
-  handler: controller.getUsers
+  path: `/${root}/files`,
+  handler: controller.getUserAccessibleFiles
 })
 
 routes.push({
@@ -21,5 +21,16 @@ routes.push({
   handler: controller.authenticate
 })
 
+routes.push({
+  method: 'POST',
+  path: `/${root}/create-directory`,
+  handler: controller.createDirectory
+})
+
+routes.push({
+  method: 'POST',
+  path: `/${root}/change-permissions`,
+  handler: controller.changePermissions
+})
 
 module.exports = routes

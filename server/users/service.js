@@ -2,23 +2,28 @@ const fs = require('fs')
 const path = require('path')
 const NodeSSH = require('node-ssh')
 const ssh = new NodeSSH()
-const userAuthentication = require('../userAuthentication')
 const _ = require('lodash')
 
-function getUsers() {
-  ssh.connect({
-    host: '127.0.0.1',
-    port: 2222,
-    username: 'ubuntu',
-    privateKey: '/Users/kandlakd/.ssh/id_rsa'
-  }).then(function() {
-    ssh.execCommand('sudo useradd -p $(openssl passwd -1 welcome) user1').then(function(result) {
-      console.log('STDOUT: ' + result.stdout)
-    }, function(error) {
-      console.log(error)
+async function getAccessibleFiles(username, password) {
+  try {
+    await ssh.connect({
+      host: '127.0.0.1',
+      port: 2222,
+      username: username,
+      password: password
     })
-  })
-  return {}
+    let response = await ssh.execCommand('cd && ls -lh | less')
+    return {
+      statusCode: 200,
+      message: 'Fetched files successfully',
+      response: response.stdout
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: 'Could not fetch user files'
+    }
+  }
 }
 
 async function create(username, password) {
@@ -29,7 +34,7 @@ async function create(username, password) {
       username: 'ubuntu',
       privateKey: '/Users/kandlakd/.ssh/id_rsa' 
     })
-    await ssh.execCommand(`sudo useradd -m -d /home/${username} ${username} -p $(openssl passwd -1 ${password})`)
+    await ssh.execCommand(`sudo useradd -m -d /home/${username} ${username} -p $(openssl passwd -1 ${password} && chown ${username}:${username} /home/${username})`)
     return {
       statusCode: 200,
       message: `${username} created on the ubuntu server`
@@ -71,8 +76,59 @@ async function authenticate(username, password) {
   }
 }
 
+async function createDirectory(username, password, folderName) {
+  try {
+    await ssh.connect({
+      host: '127.0.0.1',
+      port: 2222,
+      username: username,
+      password: password
+    })
+    await ssh.execCommand(`mkdir ${folderName}`)
+    return {
+      statusCode: 200,
+      message: `${folderName} has been created`
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: 'Error creating a directory'
+    }
+  }
+}
+
+async function changePermissions(username, password, user, filePath, directoryPath, permission) {
+  let path = ''
+  if(filePath) {
+    path = filePath
+  } else if (directoryPath) {
+    path = directoryPath
+  }
+  console.log(username, password, user, path, filePath, directoryPath, permission)
+  try {
+    await ssh.connect({
+      host: '127.0.0.1',
+      port: 2222,
+      username: username,
+      password: password
+    })
+    await ssh.execCommand(`setfacl -R -m u:${user}:${permission} ${path}`)
+    return {
+      statusCode: 200,
+      message: 'Permissions are changed'
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: 'Permissions could not be changed'
+    }
+  }
+}
+
 module.exports = {
-  getUsers,
+  getAccessibleFiles,
   create,
-  authenticate
+  authenticate,
+  createDirectory,
+  changePermissions
 }
