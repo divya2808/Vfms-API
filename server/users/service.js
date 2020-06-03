@@ -3,6 +3,7 @@ const path = require('path')
 const NodeSSH = require('node-ssh')
 const ssh = new NodeSSH()
 const _ = require('lodash')
+const contants = require('./constants')
 
 async function getAccessibleFiles(username, password) {
   try {
@@ -31,8 +32,8 @@ async function create(username, password) {
     await ssh.connect({
       host: '127.0.0.1',
       port: 2222,
-      username: 'ubuntu',
-      privateKey: '/Users/kandlakd/.ssh/id_rsa' 
+      username: constants.adminUser,
+      password: constants.adminPassword 
     })
     await ssh.execCommand(`sudo useradd -m -d /home/${username} ${username} -p $(openssl passwd -1 ${password} && chown ${username}:${username} /home/${username})`)
     return {
