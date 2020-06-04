@@ -3,13 +3,13 @@ const path = require('path')
 const NodeSSH = require('node-ssh')
 const ssh = new NodeSSH()
 const _ = require('lodash')
-const contants = require('./constants')
+const constants = require('./constants')
 
 async function getAccessibleFiles(username, password) {
   try {
     await ssh.connect({
-      host: '127.0.0.1',
-      port: 2222,
+      host: constants.host,
+      port: constants.port,
       username: username,
       password: password
     })
@@ -30,8 +30,8 @@ async function getAccessibleFiles(username, password) {
 async function create(username, password) {
   try {
     await ssh.connect({
-      host: '127.0.0.1',
-      port: 2222,
+      host: constants.host,
+      port: constants.port,
       username: constants.adminUser,
       password: constants.adminPassword 
     })
@@ -41,6 +41,7 @@ async function create(username, password) {
       message: `${username} created on the ubuntu server`
     }
   } catch (error) {
+    console.log(error)
     return {
       statusCode: 500,
       message: `Error creating user ${username}`
@@ -51,8 +52,8 @@ async function create(username, password) {
 async function authenticate(username, password) {
   try {
     await ssh.connect({
-      host: '127.0.0.1',
-      port: 2222,
+      host: constants.host,
+      port: constants.port,
       username: username,
       password: password
     })
@@ -80,8 +81,8 @@ async function authenticate(username, password) {
 async function createDirectory(username, password, folderName) {
   try {
     await ssh.connect({
-      host: '127.0.0.1',
-      port: 2222,
+      host: constants.host,
+      port: constants.port,
       username: username,
       password: password
     })
@@ -105,11 +106,10 @@ async function changePermissions(username, password, user, filePath, directoryPa
   } else if (directoryPath) {
     path = directoryPath
   }
-  console.log(username, password, user, path, filePath, directoryPath, permission)
   try {
     await ssh.connect({
-      host: '127.0.0.1',
-      port: 2222,
+      host: constants.host,
+      port: constants.port,
       username: username,
       password: password
     })
