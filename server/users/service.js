@@ -4,6 +4,8 @@ const NodeSSH = require('node-ssh')
 const ssh = new NodeSSH()
 const _ = require('lodash')
 const constants = require('./constants')
+const util = require('util');
+const exec = util.promisify(require("child_process").exec)
 
 async function getAccessibleFiles(username, password) {
   try {
@@ -126,10 +128,60 @@ async function changePermissions(username, password, user, filePath, directoryPa
   }
 }
 
+async function uploadFile(username, password, path, uploadFilePath) {
+  let uploadedFileArr = uploadFilePath.split('/')
+  let uploadedFile = uploadedFileArr[uploadedFileArr.length - 1]
+  try {
+    await ssh.connect({
+      host: constants.host,
+      port: constants.port,
+      username: username,
+      password: password
+    })
+
+    let filesNumRes = await ssh.execCommand(`cd ${path} && ls | wc -l`)
+    
+    let filesNum = _.get(filesNumRes, 'stdout')
+
+    if(filesNum < 7) {
+      let command = `sshpass -p '${password}' scp -P ${constants.port} ${uploadFilePath} ${username}@${constants.host}:${path}`
+      await exec(command)
+      let fileSizeRes = await ssh.execCommand(`ls -l ${path}/${uploadedFile} | cut -d " " -f5`)
+      let fileSize = _.get(fileSizeRes, 'stdout')
+      let parsedFileSize = parseInt(fileSize)
+
+      if(parsedFileSize <= 1024) {
+        await ssh.execCommand(`chmod 777 ${path}/${uploadedFile}`)
+      } else {
+        await ssh.execCommand(`rm ${path}/${uploadedFile}`)
+        return {
+          statusCode: 500,
+          message: 'File size is greater than 1024 bytes so, it cannot be uploaded to this directory'
+        }
+      }
+    } else {
+      return {
+        statusCode: 500,
+        message: "There are already 7 files and you cannot upload more"
+      }
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: `Error in uploading file ${error}`
+    }
+  }
+  return {
+    statusCode: 200,
+    message: `${uploadedFile} is uploaded successfully to ${path}`
+  }
+}
+
 module.exports = {
   getAccessibleFiles,
   create,
   authenticate,
   createDirectory,
-  changePermissions
+  changePermissions,
+  uploadFile
 }

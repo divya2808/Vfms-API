@@ -33,8 +33,15 @@ async function changePermissions(req) {
   let directoryPath = _.get(req, 'payload.directoryName')
   let permission = req.payload.permission
   let user = req.payload.accessUser
-  console.log(username, password, filePath, directoryPath, permission, user)
   return await service.changePermissions(username, password, user, filePath, directoryPath, permission)
+}
+
+async function uploadFile(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  let path = req.payload.path
+  let uploadFilePath = req.payload.uploadFilePath
+  return await service.uploadFile(username, password, path, uploadFilePath)
 }
 
 
@@ -43,5 +50,6 @@ module.exports = {
   authenticate,
   getUserAccessibleFiles,
   createDirectory,
-  changePermissions
+  changePermissions,
+  uploadFile
 }

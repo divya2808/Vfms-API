@@ -33,4 +33,10 @@ routes.push({
   handler: controller.changePermissions
 })
 
+routes.push({
+  method: 'POST',
+  path: `/${root}/upload-file`,
+  handler: controller.uploadFile
+})
+
 module.exports = routes
