@@ -45,4 +45,10 @@ routes.push({
   handler: controller.deleteTemp
 })
 
+routes.push({
+  method: 'POST',
+  path: '/list-files',
+  handler: controller.listFiles
+})
+
 module.exports = routes

@@ -49,6 +49,12 @@ async function deleteTemp(req) {
   return await service.deleteTemp(username, password)
 }
 
+async function listFiles(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  return await service.listFiles(username, password)
+}
+
 
 module.exports = {
   create,
@@ -57,5 +63,6 @@ module.exports = {
   createDirectory,
   changePermissions,
   uploadFile,
-  deleteTemp
+  deleteTemp,
+  listFiles
 }

@@ -4,7 +4,7 @@ const NodeSSH = require('node-ssh')
 const ssh = new NodeSSH()
 const _ = require('lodash')
 const constants = require('./constants')
-const util = require('util');
+const util = require('util')
 const exec = util.promisify(require("child_process").exec)
 
 async function getAccessibleFiles(username, password) {
@@ -213,6 +213,29 @@ async function deleteTemp(username, password) {
   }
 }
 
+async function listFiles(username, password) {
+  let testDirectoryPath = constants.testDirectoryPath
+  try {
+    await ssh.connect({
+      host: constants.host,
+      port: constants.port,
+      username: username,
+      password: password
+    })
+    let response = await ssh.execCommand(`cd ${testDirectoryPath} && ls`)
+    return {
+      statusCode: 200,
+      files: response.stdout,
+      message: 'Retrieved files'
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: 'There was an error in listing the files. Please make sure that the directory exists'
+    }
+  }
+}
+
 module.exports = {
   getAccessibleFiles,
   create,
@@ -220,5 +243,6 @@ module.exports = {
   createDirectory,
   changePermissions,
   uploadFile,
-  deleteTemp
+  deleteTemp,
+  listFiles
 }
