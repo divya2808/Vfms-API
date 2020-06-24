@@ -75,4 +75,10 @@ routes.push({
   handler: controller.replaceFile
 })
 
+routes.push({
+  method: 'POST',
+  path: '/create-empty-file',
+  handler: controller.createEmptyFile
+})
+
 module.exports = routes

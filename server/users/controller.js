@@ -83,6 +83,13 @@ async function replaceFile(req) {
   return await service.replaceFile(username, password, file, uploadFilePath)
 }
 
+async function createEmptyFile(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  let file = req.payload.file
+  return await service.createEmptyFile(username, password, file)
+}
+
 module.exports = {
   create,
   authenticate,
@@ -95,5 +102,6 @@ module.exports = {
   catFiles,
   catSingleFile,
   deleteFiles,
-  replaceFile
+  replaceFile,
+  createEmptyFile
 }

@@ -379,6 +379,29 @@ async function replaceFile(username, password, file, uploadFilePath) {
   return res
 }
 
+async function createEmptyFile(username, password, file) {
+  let testDirectoryPath = constants.testDirectoryPath
+
+  try {
+    await ssh.connect({
+      host: constants.host,
+      port: constants.port,
+      username: username,
+      password: password
+    })
+
+    return {
+      statusCode: 200,
+      message: `${file} file has been created in the folder`
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: `Error in creating file ${file}`
+    }
+  }
+}
+
 module.exports = {
   getAccessibleFiles,
   create,
@@ -391,5 +414,6 @@ module.exports = {
   catFiles,
   catSingleFile,
   deleteFiles,
-  replaceFile
+  replaceFile,
+  createEmptyFile
 }
