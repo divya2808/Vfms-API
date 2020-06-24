@@ -51,4 +51,28 @@ routes.push({
   handler: controller.listFiles
 })
 
+routes.push({
+  method: 'POST',
+  path: '/cat-files',
+  handler: controller.catFiles
+})
+
+routes.push({
+  method: 'POST',
+  path: '/cat-single-file',
+  handler: controller.catSingleFile
+})
+
+routes.push({
+  method: 'POST',
+  path: '/delete-files',
+  handler: controller.deleteFiles
+})
+
+routes.push({
+  method: 'POST',
+  path: '/replace-file',
+  handler: controller.replaceFile
+})
+
 module.exports = routes

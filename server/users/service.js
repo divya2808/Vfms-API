@@ -236,6 +236,149 @@ async function listFiles(username, password) {
   }
 }
 
+async function catFiles(username, password) {
+  let testDirectoryPath = constants.testDirectoryPath
+  try {
+    await ssh.connect({
+      host: constants.host,
+      port: constants.port,
+      username: username,
+      password: password
+    })
+
+    let response = await ssh.execCommand(`cd ${testDirectoryPath} && file -i * | grep "text/" | cut -d ":" -f1`)
+    return {
+      statusCode: 200,
+      message: "Text files are retrieved",
+      files: response.stdout
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: 'Could not get the text files from the current folder'
+    }
+  }
+}
+
+async function catSingleFile(username, password, file) {
+  let testDirectoryPath = constants.testDirectoryPath
+
+  try {
+    await ssh.connect({
+      host: constants.host,
+      port: constants.port,
+      username: username,
+      password: password
+    })
+
+    let response = await ssh.execCommand(`cat ${testDirectoryPath}/${file}`)
+    return {
+      statusCode: 200,
+      content: response.stdout,
+      message: 'Retrieved file contents successfully'
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: 'Unable to view the file right now'
+    }
+  }
+}
+
+async function deleteFiles(username, password, file) {
+  let testDirectoryPath = constants.testDirectoryPath
+
+  try {
+    await ssh.connect({
+      host: constants.host,
+      port: constants.port,
+      username: username,
+      password: password
+    })
+
+    let response = await ssh.execCommand(`rm ${testDirectoryPath}/${file}`)
+    return {
+      statusCode: 200,
+      message: 'File has been delete successfully'
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: `Unable to delete ${file} file`
+    }
+  }
+}
+
+async function replaceFile(username, password, file, uploadFilePath) {
+  let tempDirectoryPath = constants.tempDirectoryPath
+  let testDirectoryPath = constants.testDirectoryPath
+  let res = {}
+
+  let uploadedFileArr = uploadFilePath.split('/')
+  let uploadedFile = uploadedFileArr[uploadedFileArr.length - 1]
+
+  if(uploadedFile !== file) {
+    return {
+      statusCode: 500,
+      message: 'Please name the files the same and try again'
+    }
+  }
+
+  try {
+    await ssh.connect({
+      host: constants.host,
+      port: constants.port,
+      username: username,
+      password: password
+    })
+
+    let response = await ssh.execCommand(`cat ${testDirectoryPath}/${file}`)
+    
+    if(response.code === 1) {
+      return {
+        statusCode: 500,
+        message: `File ${file} does not exist in folder`
+      }
+    } else {
+      await exec(`sshpass -p '${password}' scp -P ${constants.port} ${uploadFilePath} ${username}@${constants.host}:${tempDirectoryPath}`)
+      await ssh.execCommand(`chmod 777 ${tempDirectoryPath}/${file}`)
+
+      let fileSizeRes = await ssh.execCommand(`ls -l ${tempDirectoryPath}/${file} | cut -d " " -f5`)
+      let fileSize = _.get(fileSizeRes, 'stdout')
+      let parsedFileSize = parseInt(fileSize)
+
+      if(parsedFileSize <= 1024) {
+        await ssh.execCommand(`cp ${tempDirectoryPath}/${file} ${testDirectoryPath}`)
+        await ssh.execCommand(`chmod 777 ${testDirectoryPath}/${file}`)
+
+        res = {
+          statusCode: 200,
+          message: `File ${file} has been replaced successfully`
+        }
+      } else {
+        await ssh.execCommand(`rm ${tempDirectoryPath}/${file}`)
+         res = {
+          statusCode: 500,
+          message: 'File size is greater than 1024 bytes so, it cannot be uploaded to this directory'
+        }
+      }
+      await ssh.execCommand(`rm ${tempDirectoryPath}/${file}`)
+  
+      if(res) {
+        return res
+      }
+    }
+  } catch (error) {
+    console.log(error)
+    res = {
+      statusCode: 500,
+      message: `Error in replacing the file ${file}`
+    }
+  }
+
+  return res
+}
+
 module.exports = {
   getAccessibleFiles,
   create,
@@ -244,5 +387,9 @@ module.exports = {
   changePermissions,
   uploadFile,
   deleteTemp,
-  listFiles
+  listFiles,
+  catFiles,
+  catSingleFile,
+  deleteFiles,
+  replaceFile
 }
