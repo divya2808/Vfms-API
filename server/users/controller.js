@@ -39,9 +39,14 @@ async function changePermissions(req) {
 async function uploadFile(req) {
   let username = req.payload.username
   let password = req.payload.password
-  let path = req.payload.path
   let uploadFilePath = req.payload.uploadFilePath
-  return await service.uploadFile(username, password, path, uploadFilePath)
+  return await service.uploadFile(username, password, uploadFilePath)
+}
+
+async function deleteTemp(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  return await service.deleteTemp(username, password)
 }
 
 
@@ -51,5 +56,6 @@ module.exports = {
   getUserAccessibleFiles,
   createDirectory,
   changePermissions,
-  uploadFile
+  uploadFile,
+  deleteTemp
 }

@@ -39,4 +39,10 @@ routes.push({
   handler: controller.uploadFile
 })
 
+routes.push({
+  method: 'POST',
+  path: '/quit',
+  handler: controller.deleteTemp
+})
+
 module.exports = routes
