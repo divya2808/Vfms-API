@@ -39,4 +39,46 @@ routes.push({
   handler: controller.uploadFile
 })
 
+routes.push({
+  method: 'POST',
+  path: '/quit',
+  handler: controller.deleteTemp
+})
+
+routes.push({
+  method: 'POST',
+  path: '/list-files',
+  handler: controller.listFiles
+})
+
+routes.push({
+  method: 'POST',
+  path: '/cat-files',
+  handler: controller.catFiles
+})
+
+routes.push({
+  method: 'POST',
+  path: '/cat-single-file',
+  handler: controller.catSingleFile
+})
+
+routes.push({
+  method: 'POST',
+  path: '/delete-files',
+  handler: controller.deleteFiles
+})
+
+routes.push({
+  method: 'POST',
+  path: '/replace-file',
+  handler: controller.replaceFile
+})
+
+routes.push({
+  method: 'POST',
+  path: '/create-empty-file',
+  handler: controller.createEmptyFile
+})
+
 module.exports = routes

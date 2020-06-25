@@ -39,11 +39,56 @@ async function changePermissions(req) {
 async function uploadFile(req) {
   let username = req.payload.username
   let password = req.payload.password
-  let path = req.payload.path
   let uploadFilePath = req.payload.uploadFilePath
-  return await service.uploadFile(username, password, path, uploadFilePath)
+  return await service.uploadFile(username, password, uploadFilePath)
 }
 
+async function deleteTemp(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  return await service.deleteTemp(username, password)
+}
+
+async function listFiles(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  return await service.listFiles(username, password)
+}
+
+async function catFiles(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  return await service.catFiles(username, password)
+}
+
+async function catSingleFile(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  let file = req.payload.file
+  return await service.catSingleFile(username, password, file)
+}
+
+async function deleteFiles(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  let file = req.payload.file
+  return await service.deleteFiles(username, password, file)
+}
+
+async function replaceFile(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  let file = req.payload.file
+  let uploadFilePath = req.payload.uploadFilePath
+  return await service.replaceFile(username, password, file, uploadFilePath)
+}
+
+async function createEmptyFile(req) {
+  let username = req.payload.username
+  let password = req.payload.password
+  let file = req.payload.file
+  return await service.createEmptyFile(username, password, file)
+}
 
 module.exports = {
   create,
@@ -51,5 +96,12 @@ module.exports = {
   getUserAccessibleFiles,
   createDirectory,
   changePermissions,
-  uploadFile
+  uploadFile,
+  deleteTemp,
+  listFiles,
+  catFiles,
+  catSingleFile,
+  deleteFiles,
+  replaceFile,
+  createEmptyFile
 }
