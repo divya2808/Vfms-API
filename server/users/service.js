@@ -246,7 +246,7 @@ async function catFiles(username, password) {
       password: password
     })
 
-    let response = await ssh.execCommand(`cd ${testDirectoryPath} && file -i * | grep "text/" | cut -d ":" -f1`)
+    let response = await ssh.execCommand(`cd ${testDirectoryPath} && file -i * | grep -e "text/" -e "x-empty" | cut -d ":" -f1`)
     return {
       statusCode: 200,
       message: "Text files are retrieved",
@@ -255,7 +255,7 @@ async function catFiles(username, password) {
   } catch (error) {
     return {
       statusCode: 500,
-      message: 'Could not get the text files from the current folder'
+      message: 'Could not get the text files from the current folder' 
     }
   }
 }
