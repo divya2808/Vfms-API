@@ -390,6 +390,8 @@ async function createEmptyFile(username, password, file) {
       password: password
     })
 
+    await ssh.execCommand(`cd ${testDirectoryPath} && touch ${file}`)
+    await ssh.execCommand(`chmod 777 ${testDirectoryPath}/${file}`)
     return {
       statusCode: 200,
       message: `${file} file has been created in the folder`
